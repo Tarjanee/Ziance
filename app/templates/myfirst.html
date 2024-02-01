@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>demo</title>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <title>Demo Project</title>
+    <style>
+        body {
+            background-color: #0A4D68;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container-fluid {
+            margin-top: 30px;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .nav-tabs {
+            background-color: #98DFD6;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .nav-tabs .nav-item .nav-link {
+            color: black;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .btn-primary {
+            background-color: #007BFF;
+            border: none;
+            padding: 10px 20px;
+        }
+
+        .btn-primary:disabled {
+            background-color: #b1c1d9;
+            cursor: not-allowed;
+        }
+
+        .text-red {
+            color: red;
+        }
+
+        .loading-spinner {
+            display: none;
+        }
+
+        .loading-spinner.show {
+            display: block;
+        }
+
+        .btn-check:checked + .btn-outline-primary {
+            background-color: #007BFF;
+            color: white;
+        }
+        .custom-cursor {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid"><br><br><br><br><br><br>
+        <center>
+            <h1></h1>
+        </center><br>
+        <div class="row justify-content-center">
+            <div class="col-sm-6">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="formTab" data-toggle="tab"
+                            href="#formTabContent"><b>Single</b></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="fileUploadTab" data-toggle="tab"
+                            href="#fileUploadTabContent"><b>Multiple</b></a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                        <!-- First Tab (Form) -->
+                    <div class="tab-pane fade show active" id="formTabContent">
+                        <div class="card">
+                            <h3 class="text-center">Select Type</h3>
+                            <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                                <input type="radio" class="btn-check" name="btnradio" id="formToggle1" 
+                                    autocomplete="off" checked hidden>
+                                <label class="btn btn-outline-primary m-2 custom-cursor" for="formToggle1">ID</label>
+
+                                <input type="radio" class="btn-check" name="btnradio" id="formToggle2"
+                                    autocomplete="off" hidden>
+                                <label class="btn btn-outline-primary m-2 custom-cursor" for="formToggle2">SMILE</label>
+                            </div><br> 
+                             <div id="selectedContent"></div>
+
+                            <!-- First Form -->
+                            <form id="form1" method="post" action="{% url 'process_by_id' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="form_type" value="ID">
+                                <div class="form-group">
+                                    <label for="one"><b>Drug ID<span class='text-red'>*</span></b></label>
+                                    <input type="number" class="form-control" name="one" id="one"
+                                        placeholder="Enter Drug_ID">
+                                </div>
+                                <div class="form-group">
+                                    <label for="two"><b>Excipient ID<span class='text-red'>*</span></b></label>
+                                    <input type="number" class="form-control" name="two" id="two"
+                                        placeholder="Enter Excipient_ID">
+                                </div><br>
+                                <center>
+                                    <button id="ajaxButton" class="btn btn-primary" value="Check Empty"
+                                        disabled>Submit</button>
+                                    <div class="loading-spinner text-center mt-2">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="sr-only">Loading...</span><br>
+                                        </div>
+                                    </div>
+                                </center><br>
+                                <div id="result"></div>
+                            </form>
+                            <!-- Second Form -->
+                            <form id="form2" style="display: none;" method="post" action="{% url 'process_by_smile' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="form_type" value="SMILE">
+                                <div class="form-group">
+                                    <label for="input1"><b>Drug
+                                            SMILE</b></label>
+                                    <input type="text" class="form-control" id="one1" name="one1"
+                                        placeholder="Enter Drug_SMILE">
+                                </div>
+                                <div class="form-group">
+                                    <label for="input1"><b>Excipient
+                                            SMILE</b></label>
+                                    <input type="text" class="form-control" id="two2" name="two2"
+                                        placeholder="Enter Excipient_SMILE">
+                                </div><br>
+                                <center>
+                                    <button id="ajaxButton3" class="btn btn-primary" value="Check Empty"
+                                        disabled>Submit</button>
+                                    <div class="loading-spinner text-center mt-2">
+                                        <div class="spinner-border text-primary" role="status"><br>
+                                            <span class="sr-only">Loading...</span><br>
+                                        </div>
+                                    </div>
+                                </center>
+                            </form><br>
+                            <div id="result2"></div>
+                        </div>
+                    </div>
+                    <!-- Second Tab (File Upload) -->
+                    <div class="tab-pane fade" id="fileUploadTabContent">
+                        <div class="card">
+                            <h3 class="text-center">File Upload</h3>
+                            <form id="predictForm" method="post" enctype="multipart/form-data"
+                                action="{% url 'process_by_excel' %}">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="fileInput">Upload Excel
+                                        File<span class="text-red">*</span>:</label>
+                                    <input type="file" class="form-control-file" id="fileInput" accept=".xls, .xlsx"
+                                        name="file">
+                                    <small class="form-text text-muted">Only
+                                        Excel file (.xls, .xlsx) are
+                                        allowed.</small>
+                                </div><br>
+                                <center>
+                                    <button type='submit' class="btn btn-primary w-26" id="submitBtn" disabled>Submit
+                                        File</button><br><br>
+                                    <div id="downloadLink"></div>
+                                    <div class="loading-spinner text-center mt-3">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="sr-only">Loading...</span><br>
+                                        </div>
+                                    </div>
+                                </center>
+                            </form>
+                            <div id="loadingBoxFileUpload"></div>
+                            <div id="resultBoxFileUpload"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script> 
+        $('#formToggle1').change(function () {
+            var form1 = $('#form1');
+            var form2 = $('#form2');
+            if ($(this).prop('checked')) {
+                form1.show();
+                form2.hide();
+            } else {
+                form1.show();
+                form2.hide();
+            }
+        });
+        $('#formToggle2').change(function () {
+            var form1 = $('#form1');
+            var form2 = $('#form2');
+            if ($(this).prop('checked')) {
+                form1.hide();
+                form2.show();
+            } else {
+                form1.show();
+                form2.hide();
+            }
+        });
+
+        $(document).ready(function () {
+            $('#form1').submit(function (event) {
+                event.preventDefault();
+
+                var formType = 'ID';
+                var drugId = $('#one').val();
+                var excipientId = $('#two').val();
+                var csrfToken = $('[name=csrfmiddlewaretoken]').val();
+
+                $('.loading-spinner').addClass('show');
+
+                $.ajax({
+                    url: '/process_by_id/',
+                    method: 'POST',
+                    data: {
+                        'form_type': formType,
+                        'one': drugId,
+                        'two': excipientId,
+                        'csrfmiddlewaretoken': csrfToken
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        $('.loading-spinner').removeClass('show');
+                        if (data.output) {
+                            $('#result').html(`<label style="display: block; margin-bottom: 20px; padding: 10px; background-color: #62BA27; font-size: 20px; color: black;">
+                                ${data.output}
+                            </label>`);
+                        } else {
+                            $('#result').html(data.error);
+                        }
+                    },
+                    error: function (error) {
+                        $('.loading-spinner').removeClass('show');
+                        $('#result').html('Error: ' + error.responseText);
+                    }
+                });
+            });
+            $('input[name="btnradio"]').change(function () {
+                // Get the value of the selected radio button
+                var selectedValue = $('input[name="btnradio"]:checked').val();
+    
+                // Display content based on the selected radio button
+                if (selectedValue === 'ID') {
+                    $('#selectedContent').html('<p>You selected ID.</p>');
+                } else if (selectedValue === 'SMILE') {
+                    $('#selectedContent').html('<p>You selected SMILE.</p>');
+                }
+            });
+
+            $('#form2').submit(function (event) {
+                event.preventDefault();
+
+                var formType = 'SMILE';
+                var drugsmile = $('#one1').val();
+                var excipientSmile = $('#two2').val();
+                var csrfToken = $('[name=csrfmiddlewaretoken]').val();
+
+                $('.loading-spinner').addClass('show');
+
+                $.ajax({
+                    url: '/process_by_smile/',
+                    method: 'POST',
+                    data: {
+                        'form_type': formType,
+                        'one1': drugsmile,
+                        'two2': excipientSmile,
+                        'csrfmiddlewaretoken': csrfToken
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        $('.loading-spinner').removeClass('show');
+                        if (data.output) {
+                            $('#result2').html(`<label style="display: block; margin-bottom: 20px; padding: 10px; background-color: #62BA27; font-size: 20px; color: black;">
+                                ${data.output}
+                            </label>`);
+                        } else {
+                            $('#result2').html(data.error);
+                        }
+                    },
+                    error: function (error) {
+                        $('.loading-spinner').removeClass('show');
+                        $('#result2').html('Error: ' + error.responseText);
+                    }
+                });
+            });
+
+            $('#fileInput').change(function () {
+                if ($(this).val()) {
+                    $('#submitBtn').prop('disabled', false);
+                } else {
+                    $('#submitBtn').prop('disabled', true);
+                }
+            });
+
+            $('#one1, #two2').on('input', function () {
+                if ($('#one1').val().trim() !== '' && $('#two2').val().trim() !== '') {
+                    $('#ajaxButton3').prop('disabled', false);
+                } else {
+                    $('#ajaxButton3').prop('disabled', true);
+                }
+            });
+
+            $('#one, #two').on('input', function () {
+                if ($('#one').val().trim() !== '' && $('#two').val().trim() !== '') {
+                    $('#ajaxButton').prop('disabled', false);
+                } else {
+                    $('#ajaxButton').prop('disabled', true);
+                }
+            });
+
+            $("#predictForm").submit(function (event) {
+                event.preventDefault();
+
+                var csrfToken = $('[name=csrfmiddlewaretoken]').val();
+                var formData = new FormData(this);
+                formData.append('csrfmiddlewaretoken', csrfToken);
+
+                $('.loading-spinner').addClass('show');
+
+                $('#loadingBoxFileUpload').html('<div class="loading-spinner text-center mt-2"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div></div>');
+
+                $.ajax({
+                    url: '/process_by_excel/',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        $('.loading-spinner').removeClass('show');
+                        console.log("RES", response);
+                        if (response.success) {
+                            $("#downloadLink").html(`<a href="/download_excel/?path=${response.path}" 
+                                download>Download File</a>`);
+                            $('#fileInput').val('');
+                        }
+                    },
+                    error: function (error) {
+                        $('.loading-spinner').removeClass('show');
+                        console.log("err", error);
+                        $('#resultBoxFileUpload').html('Error: ' + error.responseText);
+                    },
+                    complete: function () {
+                        $('#loadingBoxFileUpload').html('');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
